@@ -111,18 +111,18 @@ class TeamsRTLRunnerBase(object):
             logging.info('Injecting to {}'.format(title))
             ws = self.window_to_socket[chat_window['id']]
             with open(script_path, 'rb') as f:
-                payload = self.get_eval_expression(f.read())
+                payload = self.get_eval_expression(f.read().decode('utf-8'))
             ws.send(json.dumps(payload))
 
             res = json.loads(ws.recv()).get('result', {})
             if not res or res.get('exceptionDetails', None):
                 error = res.get('exceptionDetails', {}).get('exception', {})
-                logging.warn('Failed injecting script {} to window {} due to {}; Continuing to next window'.format(
+                logging.warning('Failed injecting script {} to window {} due to {}; Continuing to next window'.format(
                     script_path, title, error))
             else:
                 injected = True
         except Exception as e:
-            logging.warn('Failed for window {}; Continuing'.format(title))
+            logging.warning('Failed for window {}; Continuing'.format(title))
         return injected
 
     def get_eval_expression(self, expression):
